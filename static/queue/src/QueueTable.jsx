@@ -10,6 +10,7 @@ const CATEGORY_CLASS = {
 // without needing a full timestamp column.
 function age(iso) {
   const ms = Date.now() - new Date(iso).getTime();
+  if (!iso || Number.isNaN(ms)) return '—';
   const minutes = Math.floor(ms / 60000);
   if (minutes < 60) return `${minutes}m`;
   const hours = Math.floor(minutes / 60);

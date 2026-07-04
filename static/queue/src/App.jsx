@@ -13,7 +13,8 @@ function loadSavedFilter() {
   try {
     const saved = window.localStorage.getItem(FILTER_STORAGE_KEY);
     return ['all', 'unassigned', 'mine'].includes(saved) ? saved : 'all';
-  } catch {
+  } catch (err) {
+    console.warn('localStorage unavailable, filter will not persist', err);
     return 'all';
   }
 }

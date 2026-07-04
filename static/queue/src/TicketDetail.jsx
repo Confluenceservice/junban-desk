@@ -57,14 +57,23 @@ const TicketDetail = ({ issueKey, onTicketChanged }) => {
     });
   };
 
+  // Guards against a stale response landing after the agent has already
+  // switched rows: only the latest load() call may write state.
+  const loadGeneration = React.useRef(0);
+
   const load = async () => {
+    const generation = ++loadGeneration.current;
     setState({ status: 'loading' });
     try {
       const data = await invoke('getTicket', { issueKey });
-      setState({ status: 'ready', data });
+      if (generation === loadGeneration.current) {
+        setState({ status: 'ready', data });
+      }
     } catch (err) {
       console.error('Failed to load ticket', err);
-      setState({ status: 'error', message: err.message });
+      if (generation === loadGeneration.current) {
+        setState({ status: 'error', message: err.message });
+      }
     }
   };
 
@@ -87,6 +96,7 @@ const TicketDetail = ({ issueKey, onTicketChanged }) => {
     } catch (err) {
       console.error('Failed to load assignable users', err);
       setAssignees([]);
+      setSubmitError('Could not load assignable users');
     }
   };
 
@@ -111,14 +121,22 @@ const TicketDetail = ({ issueKey, onTicketChanged }) => {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      await invoke('submitReply', {
+      const result = await invoke('submitReply', {
         issueKey,
         body: reply.trim(),
         internal,
         transitionId: transitionId || null,
       });
-      setReply('');
+      // The comment can persist even when the status change fails. Clear
+      // the reply box whenever the comment went through so a retry can't
+      // post it twice, but surface the transition failure.
+      if (result.commentPosted || result.ok) {
+        setReply('');
+      }
       setTransitionId('');
+      if (!result.ok) {
+        setSubmitError(result.transitionError || 'Status change failed');
+      }
       await load();
       onTicketChanged();
     } catch (err) {
