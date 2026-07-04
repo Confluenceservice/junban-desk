@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { invoke } from '@forge/bridge';
 import QueueTable from './QueueTable';
 import TicketDetail from './TicketDetail';
@@ -27,6 +27,28 @@ function saveFilter(filter) {
   }
 }
 
+const SELECTED_STORAGE_KEY = 'redesk.queue.selected';
+
+function loadSavedSelection() {
+  try {
+    return window.localStorage.getItem(SELECTED_STORAGE_KEY) || null;
+  } catch {
+    return null;
+  }
+}
+
+function saveSelection(key) {
+  try {
+    if (key) {
+      window.localStorage.setItem(SELECTED_STORAGE_KEY, key);
+    } else {
+      window.localStorage.removeItem(SELECTED_STORAGE_KEY);
+    }
+  } catch {
+    // Storage unavailable — selection just won't survive a reload.
+  }
+}
+
 /**
  * re-desk queue workspace.
  *
@@ -36,7 +58,15 @@ function saveFilter(filter) {
  */
 const App = () => {
   const [queue, setQueue] = useState({ status: 'loading' });
-  const [selectedKey, setSelectedKey] = useState(null);
+  // Restored from the last session so a forced page reload lands the agent
+  // back on the ticket they were working; validated against the first queue
+  // load below.
+  const [selectedKey, setSelectedKeyState] = useState(loadSavedSelection);
+
+  const setSelectedKey = useCallback((key) => {
+    setSelectedKeyState(key);
+    saveSelection(key);
+  }, []);
   // True while a refresh of an already-loaded table is in flight, so the
   // table can show a progress bar instead of being torn down.
   const [refreshing, setRefreshing] = useState(false);
@@ -89,6 +119,22 @@ const App = () => {
   const handleTicketChanged = useCallback(() => {
     loadQueue();
   }, [loadQueue]);
+
+  // Drop a restored selection whose ticket is no longer in the queue
+  // (resolved or waiting since last session). Runs once on the first
+  // successful load — later refreshes must not close the pane, e.g. right
+  // after the agent transitions the ticket away.
+  const restoreValidated = useRef(false);
+  useEffect(() => {
+    if (queue.status !== 'ready' || restoreValidated.current) return;
+    restoreValidated.current = true;
+    if (
+      selectedKey &&
+      !queue.data.issues.some((i) => i.key === selectedKey)
+    ) {
+      setSelectedKey(null);
+    }
+  }, [queue, selectedKey, setSelectedKey]);
 
   if (queue.status === 'loading') {
     return (
