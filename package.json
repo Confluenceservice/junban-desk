@@ -1,0 +1,19 @@
+{
+  "name": "jira-service-management-queue-page-ui-kit",
+  "version": "1.1.44-next.4",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "lint": "eslint src/**/*",
+    "build:queue": "npm --prefix static/queue run build"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-plugin-react-hooks": "^4.6.0"
+  },
+  "dependencies": {
+    "@forge/api": "^6.0.0",
+    "@forge/resolver": "2.0.0"
+  }
+}

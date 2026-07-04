@@ -1,0 +1,353 @@
+/* Minimal styling roughly aligned with Atlassian's visual language. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  color: #172b4d;
+}
+
+.message {
+  padding: 12px;
+  color: #6b778c;
+}
+
+.message.error {
+  color: #de350b;
+}
+
+/* --- Layout: table left, detail right --- */
+.workspace {
+  display: flex;
+  gap: 16px;
+  height: 100vh;
+  padding: 12px;
+}
+
+.queue-pane {
+  flex: 1 1 55%;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.detail-pane {
+  flex: 1 1 45%;
+  min-width: 0;
+  overflow-y: auto;
+  border-left: 1px solid #ebecf0;
+  padding-left: 16px;
+}
+
+/* --- Queue header --- */
+.queue-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.queue-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.queue-count {
+  color: #6b778c;
+  font-size: 12px;
+}
+
+.refresh-button {
+  margin-left: auto;
+  padding: 4px 10px;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  background: #fafbfc;
+  cursor: pointer;
+}
+
+.refresh-button:hover {
+  background: #ebecf0;
+}
+
+/* --- Filter bar --- */
+.filter-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.filter-button {
+  padding: 4px 12px;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  background: #fafbfc;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.filter-button:hover {
+  background: #ebecf0;
+}
+
+.filter-button.active {
+  background: #0052cc;
+  border-color: #0052cc;
+  color: #ffffff;
+}
+
+/* --- Queue table --- */
+.queue-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.queue-table th {
+  text-align: left;
+  font-size: 12px;
+  color: #6b778c;
+  padding: 6px 8px;
+  border-bottom: 2px solid #ebecf0;
+}
+
+.queue-table td {
+  padding: 8px;
+  border-bottom: 1px solid #ebecf0;
+  white-space: nowrap;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover {
+  background: #f4f5f7;
+}
+
+.row.selected {
+  background: #deebff;
+}
+
+.cell-key {
+  color: #0052cc;
+  font-weight: 500;
+}
+
+.cell-summary {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.col-age {
+  text-align: right;
+  color: #6b778c;
+}
+
+.unassigned {
+  color: #de350b;
+  font-style: normal;
+}
+
+/* --- Lozenges --- */
+.lozenge {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #dfe1e6;
+  color: #42526e;
+}
+
+.lozenge-progress {
+  background: #deebff;
+  color: #0747a6;
+}
+
+.lozenge-done {
+  background: #e3fcef;
+  color: #006644;
+}
+
+/* --- Ticket detail --- */
+.ticket-header {
+  margin-bottom: 12px;
+}
+
+.issue-key {
+  color: #0052cc;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.issue-key:hover {
+  text-decoration: underline;
+}
+
+.ticket-summary {
+  margin: 4px 0 8px;
+  font-size: 16px;
+}
+
+.ticket-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+  color: #6b778c;
+}
+
+.description-section {
+  margin-top: 10px;
+}
+
+.description-toggle {
+  display: block;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #42526e;
+  cursor: pointer;
+}
+
+.description-toggle:hover {
+  color: #0052cc;
+}
+
+.ticket-description {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #f4f5f7;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.assign-me-button {
+  padding: 3px 10px;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  background: #fafbfc;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.assign-me-button:hover:not(:disabled) {
+  background: #ebecf0;
+}
+
+.assign-me-button:disabled {
+  color: #6b778c;
+  cursor: default;
+}
+
+/* --- Comment thread --- */
+.thread {
+  margin-bottom: 12px;
+}
+
+.comment {
+  padding: 8px 10px;
+  border: 1px solid #ebecf0;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background: #ffffff;
+}
+
+.comment.internal {
+  background: #fffae6;
+  border-color: #ffe380;
+}
+
+.comment-head {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.internal-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #974f0c;
+  background: #ffe380;
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+.comment-date {
+  margin-left: auto;
+  font-size: 11px;
+  color: #6b778c;
+}
+
+.comment-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* --- Reply box --- */
+.reply-box {
+  border-top: 2px solid #ebecf0;
+  padding-top: 10px;
+}
+
+.reply-input {
+  width: 100%;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  padding: 8px;
+  font: inherit;
+  resize: vertical;
+}
+
+.reply-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.internal-toggle {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.status-select {
+  padding: 4px 8px;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  font: inherit;
+  font-size: 12px;
+}
+
+.submit-button {
+  margin-left: auto;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 3px;
+  background: #0052cc;
+  color: #ffffff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #0747a6;
+}
+
+.submit-button:disabled {
+  background: #dfe1e6;
+  color: #6b778c;
+  cursor: default;
+}

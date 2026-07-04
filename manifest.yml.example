@@ -1,0 +1,26 @@
+# Copy to manifest.yml, then run `forge register` to mint your own app id
+# (it rewrites app.id below). Never commit your real manifest.yml.
+modules:
+  jiraServiceManagement:queuePage:
+    - key: re-desk-queue-workspace
+      resource: queue
+      resolver:
+        function: resolver
+      title: re-desk
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: queue
+    path: static/queue/dist
+permissions:
+  scopes:
+    - read:jira-work
+    - write:jira-work
+    - read:jira-user
+app:
+  runtime:
+    name: nodejs24.x
+    memoryMB: 256
+    architecture: arm64
+  id: ari:cloud:ecosystem::app/REPLACE-WITH-YOUR-APP-ID

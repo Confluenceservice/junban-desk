@@ -1,0 +1,271 @@
+import React, { useEffect, useState } from 'react';
+import { invoke, router } from '@forge/bridge';
+
+const DESC_STORAGE_KEY = 'redesk.description.collapsed';
+
+// localStorage can throw in a sandboxed iframe, so wrap access.
+function loadDescCollapsed() {
+  try {
+    return window.localStorage.getItem(DESC_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function saveDescCollapsed(collapsed) {
+  try {
+    window.localStorage.setItem(DESC_STORAGE_KEY, String(collapsed));
+  } catch {
+    // Storage unavailable — preference just won't survive a reload.
+  }
+}
+
+function formatDateTime(iso) {
+  return new Date(iso).toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+/**
+ * Inline ticket detail: fields, comment thread, reply box.
+ *
+ * Reply supports an internal-note toggle and a Zendesk-style
+ * status-at-submit dropdown, so an agent can answer, mark the ticket
+ * "waiting for customer" and move on without leaving the queue.
+ */
+const TicketDetail = ({ issueKey, onTicketChanged }) => {
+  const [state, setState] = useState({ status: 'loading' });
+  const [reply, setReply] = useState('');
+  const [internal, setInternal] = useState(false);
+  const [transitionId, setTransitionId] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  // Assignable users load lazily the first time the dropdown is opened.
+  const [assignees, setAssignees] = useState(null);
+  const [assigning, setAssigning] = useState(false);
+  // Collapsed state is a global preference, shared across tickets.
+  const [descCollapsed, setDescCollapsed] = useState(loadDescCollapsed);
+
+  const toggleDescription = () => {
+    setDescCollapsed((prev) => {
+      saveDescCollapsed(!prev);
+      return !prev;
+    });
+  };
+
+  const load = async () => {
+    setState({ status: 'loading' });
+    try {
+      const data = await invoke('getTicket', { issueKey });
+      setState({ status: 'ready', data });
+    } catch (err) {
+      console.error('Failed to load ticket', err);
+      setState({ status: 'error', message: err.message });
+    }
+  };
+
+  // Reload whenever the agent picks a different row.
+  useEffect(() => {
+    setReply('');
+    setInternal(false);
+    setTransitionId('');
+    setSubmitError(null);
+    setAssignees(null);
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [issueKey]);
+
+  const loadAssignees = async () => {
+    if (assignees) return; // already loaded for this ticket
+    try {
+      const users = await invoke('getAssignableUsers', { issueKey });
+      setAssignees(users);
+    } catch (err) {
+      console.error('Failed to load assignable users', err);
+      setAssignees([]);
+    }
+  };
+
+  const assign = async (accountId) => {
+    setAssigning(true);
+    setSubmitError(null);
+    try {
+      await invoke('assignIssue', { issueKey, accountId });
+      await load();
+      onTicketChanged();
+    } catch (err) {
+      console.error('Failed to assign', err);
+      setSubmitError(err.message);
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!reply.trim() && !transitionId) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      await invoke('submitReply', {
+        issueKey,
+        body: reply.trim(),
+        internal,
+        transitionId: transitionId || null,
+      });
+      setReply('');
+      setTransitionId('');
+      await load();
+      onTicketChanged();
+    } catch (err) {
+      console.error('Failed to submit reply', err);
+      setSubmitError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (state.status === 'loading') {
+    return <div className="message">Loading {issueKey}…</div>;
+  }
+  if (state.status === 'error') {
+    return (
+      <div className="message error">
+        Could not load {issueKey}: {state.message}
+      </div>
+    );
+  }
+
+  const { ticket, comments, transitions } = state.data;
+
+  return (
+    <div className="ticket-detail">
+      <div className="ticket-header">
+        <a
+          href="#"
+          className="issue-key"
+          onClick={(e) => {
+            e.preventDefault();
+            router.open(`/browse/${issueKey}`);
+          }}
+        >
+          {issueKey}
+        </a>
+        <h3 className="ticket-summary">{ticket.summary}</h3>
+        <div className="ticket-meta">
+          <span className="lozenge">{ticket.status}</span>
+          <span>Reporter: {ticket.reporter || '—'}</span>
+          <span>Assignee: {ticket.assignee || 'Unassigned'}</span>
+          <button
+            className="assign-me-button"
+            disabled={assigning}
+            onClick={() => assign('me')}
+          >
+            {assigning ? 'Assigning…' : 'Assign to me'}
+          </button>
+          <select
+            className="status-select"
+            value=""
+            disabled={assigning}
+            onFocus={loadAssignees}
+            onChange={(e) => {
+              if (!e.target.value) return;
+              assign(e.target.value === '__unassign__' ? null : e.target.value);
+            }}
+          >
+            <option value="">Assign to…</option>
+            <option value="__unassign__">(Unassign)</option>
+            {(assignees || []).map((u) => (
+              <option key={u.accountId} value={u.accountId}>
+                {u.displayName}
+              </option>
+            ))}
+          </select>
+        </div>
+        {ticket.description && (
+          <div className="description-section">
+            <button
+              type="button"
+              className="description-toggle"
+              onClick={toggleDescription}
+            >
+              {descCollapsed ? '▸' : '▾'} Description
+            </button>
+            {!descCollapsed && (
+              <div className="ticket-description">{ticket.description}</div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="thread">
+        {comments.length === 0 && (
+          <div className="message">No comments yet.</div>
+        )}
+        {comments.map((c) => (
+          <div
+            key={c.id}
+            className={c.internal ? 'comment internal' : 'comment'}
+          >
+            <div className="comment-head">
+              <strong>{c.author}</strong>
+              {c.internal && <span className="internal-badge">Internal</span>}
+              <span className="comment-date">{formatDateTime(c.created)}</span>
+            </div>
+            <div className="comment-body">{c.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <form className="reply-box" onSubmit={handleSubmit}>
+        <textarea
+          className="reply-input"
+          placeholder={
+            internal ? 'Add an internal note…' : 'Reply to the customer…'
+          }
+          value={reply}
+          onChange={(e) => setReply(e.target.value)}
+          rows={4}
+        />
+        <div className="reply-controls">
+          <label className="internal-toggle">
+            <input
+              type="checkbox"
+              checked={internal}
+              onChange={(e) => setInternal(e.target.checked)}
+            />
+            Internal note
+          </label>
+          <select
+            className="status-select"
+            value={transitionId}
+            onChange={(e) => setTransitionId(e.target.value)}
+          >
+            <option value="">Keep status: {ticket.status}</option>
+            {transitions.map((t) => (
+              <option key={t.id} value={t.id}>
+                Move to: {t.to}
+              </option>
+            ))}
+          </select>
+          <button
+            type="submit"
+            className="submit-button"
+            disabled={submitting || (!reply.trim() && !transitionId)}
+          >
+            {submitting ? 'Submitting…' : 'Submit'}
+          </button>
+        </div>
+        {submitError && (
+          <div className="message error">Submit failed: {submitError}</div>
+        )}
+      </form>
+    </div>
+  );
+};
+
+export default TicketDetail;
