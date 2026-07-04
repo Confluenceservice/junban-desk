@@ -58,6 +58,11 @@ resolver.define('getQueue', async (req) => {
   if (!projectKey) {
     throw new Error('getQueue must be invoked from a JSM queue page');
   }
+  // Defence in depth: the key is interpolated into JQL below, so reject
+  // anything that isn't a plain Jira project key before it gets there.
+  if (!/^[A-Z][A-Z0-9_]*$/.test(projectKey)) {
+    throw new Error(`Unexpected project key format: ${projectKey}`);
+  }
 
   const fields = 'summary,status,reporter,assignee,created,updated';
 
@@ -161,6 +166,14 @@ resolver.define('getTicket', async (req) => {
     throw new Error(`Failed to load ${issueKey}: ${issueRes.status}`);
   }
   const issue = await issueRes.json();
+  // Partial failures degrade to empty lists but must not be silent —
+  // an empty thread caused by a 5xx looks identical to "no comments".
+  if (!commentsRes.ok) {
+    console.warn(`getTicket: comments load failed for ${issueKey}: ${commentsRes.status}`);
+  }
+  if (!transitionsRes.ok) {
+    console.warn(`getTicket: transitions load failed for ${issueKey}: ${transitionsRes.status}`);
+  }
   const comments = commentsRes.ok ? await commentsRes.json() : { comments: [] };
   const transitions = transitionsRes.ok
     ? await transitionsRes.json()
@@ -224,6 +237,8 @@ resolver.define('submitReply', async (req) => {
         body: JSON.stringify(payload),
       });
     if (!commentRes.ok) {
+      // Nothing persisted yet — safe to fail the whole call and let the
+      // agent retry without risking a duplicate comment.
       throw new Error(`Comment failed: ${commentRes.status}`);
     }
   }
@@ -237,11 +252,18 @@ resolver.define('submitReply', async (req) => {
         body: JSON.stringify({ transition: { id: transitionId } }),
       });
     if (transitionRes.status !== 204) {
-      throw new Error(`Transition failed: ${transitionRes.status}`);
+      // The comment (if any) already persisted. Throwing here would make
+      // the frontend keep the reply text and a retry would post it twice,
+      // so report the partial failure instead of failing the call.
+      return {
+        ok: false,
+        commentPosted: Boolean(body),
+        transitionError: `Status change failed: ${transitionRes.status}`,
+      };
     }
   }
 
-  return { ok: true };
+  return { ok: true, commentPosted: Boolean(body) };
 });
 
 export const handler = resolver.getDefinitions();
