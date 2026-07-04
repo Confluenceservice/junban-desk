@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { invoke, router } from '@forge/bridge';
 import RichText from './RichText';
 
-const DESC_STORAGE_KEY = 'redesk.description.collapsed';
+const DESC_STORAGE_KEY = 'junbandesk.description.collapsed';
 
 // localStorage can throw in a sandboxed iframe, so wrap access.
 function loadDescCollapsed() {

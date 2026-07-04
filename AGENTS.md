@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for AI coding agents (and humans) working on **re-desk** — an Atlassian Forge Cloud
+Guidance for AI coding agents (and humans) working on **Junban Desk** — an Atlassian Forge Cloud
 app that replaces the default Jira Service Management queue views with a single "needs action"
 workspace: ticket table + inline detail pane (comment thread, reply, internal notes,
 status-at-submit, assignment).

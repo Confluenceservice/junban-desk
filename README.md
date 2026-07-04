@@ -1,8 +1,8 @@
-# re-desk
+# Junban Desk
 
 A custom queue workspace for Jira Service Management, built on [Atlassian Forge](https://developer.atlassian.com/platform/forge/).
 
-re-desk replaces the default JSM queue views with a single, focused agent workspace:
+Junban Desk replaces the default JSM queue views with a single, focused agent workspace:
 
 - **"Needs action" queue** — every open ticket that is not waiting on the customer, oldest first
 - **Filters** — All / Unassigned / Assigned to me (remembered across reloads)
@@ -14,6 +14,17 @@ re-desk replaces the default JSM queue views with a single, focused agent worksp
 The frontend is Forge Custom UI (React + Vite in a sandboxed iframe). The backend is a set of
 Forge resolvers calling the Jira REST API as the logged-in agent, so Jira's own permission
 checks always apply.
+
+## Documentation and support
+
+- **User guide:** <https://thomasbergernz.github.io/junban-desk/>
+- **Installation:** <https://thomasbergernz.github.io/junban-desk/install>
+- **Support:** <https://thomasbergernz.github.io/junban-desk/support>
+- **Privacy policy:** <https://thomasbergernz.github.io/junban-desk/privacy>
+- **Security policy:** [SECURITY.md](SECURITY.md)
+
+The easiest way to use Junban Desk is the Atlassian Marketplace listing (paid, per user).
+The instructions below are for running your own copy from source.
 
 ## Project layout
 
@@ -42,7 +53,7 @@ forge deploy -e development
 forge install   # choose Jira and your site
 ```
 
-The app appears as **re-desk** in the sidebar of your JSM project.
+The app appears as **Junban Desk** in the sidebar of your JSM project.
 
 ### Development loop
 
