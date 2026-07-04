@@ -2,11 +2,11 @@
 # (it rewrites app.id below). Never commit your real manifest.yml.
 modules:
   jiraServiceManagement:queuePage:
-    - key: re-desk-queue-workspace
+    - key: junban-desk-queue-workspace
       resource: queue
       resolver:
         function: resolver
-      title: re-desk
+      title: Junban Desk
   function:
     - key: resolver
       handler: index.handler

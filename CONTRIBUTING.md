@@ -1,4 +1,4 @@
-# Contributing to re-desk
+# Contributing to Junban Desk
 
 Thanks for your interest in contributing! This is a small project, so the process is
 deliberately lightweight.
@@ -63,8 +63,9 @@ and relevant `forge logs` output if it's a backend issue.
 
 ## Security
 
-Please do **not** open public issues for security vulnerabilities. Report them privately
-via [GitHub Security Advisories](../../security/advisories/new).
+See [SECURITY.md](SECURITY.md). In short: do **not** open public issues for security
+vulnerabilities — report them privately via
+[GitHub Security Advisories](../../security/advisories/new).
 
 ## License
 

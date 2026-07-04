@@ -58,5 +58,5 @@ SemVer.
 - Forge manifest template (`manifest.yml.example`) so forks register their
   own app id
 
-[0.2.0]: https://github.com/thomasbergernz/re-desk/releases/tag/v0.2.0
-[0.1.0]: https://github.com/thomasbergernz/re-desk/releases/tag/v0.1.0
+[0.2.0]: https://github.com/thomasbergernz/junban-desk/releases/tag/v0.2.0
+[0.1.0]: https://github.com/thomasbergernz/junban-desk/releases/tag/v0.1.0

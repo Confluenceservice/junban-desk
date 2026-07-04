@@ -6,7 +6,7 @@ import TicketDetail from './TicketDetail';
 // How often the queue table refreshes itself in the background.
 const POLL_INTERVAL_MS = 30_000;
 
-const FILTER_STORAGE_KEY = 'redesk.queue.filter';
+const FILTER_STORAGE_KEY = 'junbandesk.queue.filter';
 
 // localStorage can throw in a sandboxed iframe, so wrap access.
 function loadSavedFilter() {
@@ -27,7 +27,7 @@ function saveFilter(filter) {
   }
 }
 
-const SELECTED_STORAGE_KEY = 'redesk.queue.selected';
+const SELECTED_STORAGE_KEY = 'junbandesk.queue.selected';
 
 function loadSavedSelection() {
   try {
@@ -49,7 +49,7 @@ function saveSelection(key) {
   }
 }
 
-const SPLIT_STORAGE_KEY = 'redesk.queue.split';
+const SPLIT_STORAGE_KEY = 'junbandesk.queue.split';
 
 // Queue pane width as a % of the workspace. Clamped so neither pane can
 // be dragged into uselessness.
@@ -79,7 +79,7 @@ function saveSplit(pct) {
 }
 
 /**
- * re-desk queue workspace.
+ * Junban Desk queue workspace.
  *
  * Layout: "needs action" ticket table on the left, inline detail pane
  * (comment thread + reply box) on the right. Replaces the default JSM
