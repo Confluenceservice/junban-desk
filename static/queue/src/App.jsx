@@ -37,6 +37,9 @@ function saveFilter(filter) {
 const App = () => {
   const [queue, setQueue] = useState({ status: 'loading' });
   const [selectedKey, setSelectedKey] = useState(null);
+  // True while a refresh of an already-loaded table is in flight, so the
+  // table can show a progress bar instead of being torn down.
+  const [refreshing, setRefreshing] = useState(false);
   // 'all' | 'unassigned' | 'mine' — applied client-side to the loaded queue.
   const [filter, setFilterState] = useState(loadSavedFilter);
 
@@ -46,6 +49,7 @@ const App = () => {
   }, []);
 
   const loadQueue = useCallback(async () => {
+    setRefreshing(true);
     try {
       const data = await invoke('getQueue');
       setQueue({ status: 'ready', data });
@@ -56,6 +60,8 @@ const App = () => {
       setQueue((prev) =>
         prev.status === 'ready' ? prev : { status: 'error', message: err.message }
       );
+    } finally {
+      setRefreshing(false);
     }
   }, []);
 
@@ -85,7 +91,11 @@ const App = () => {
   }, [loadQueue]);
 
   if (queue.status === 'loading') {
-    return <div className="message">Loading queue…</div>;
+    return (
+      <div className="message loading">
+        <span className="spinner" /> Loading queue…
+      </div>
+    );
   }
   if (queue.status === 'error') {
     return (
@@ -116,8 +126,12 @@ const App = () => {
             {filtered.length} of {issues.length} ticket
             {issues.length === 1 ? '' : 's'} in {project.key}
           </span>
-          <button className="refresh-button" onClick={loadQueue}>
-            Refresh
+          <button
+            className="refresh-button"
+            onClick={loadQueue}
+            disabled={refreshing}
+          >
+            {refreshing ? 'Refreshing…' : 'Refresh'}
           </button>
         </div>
         <div className="filter-bar">
@@ -131,11 +145,17 @@ const App = () => {
             </button>
           ))}
         </div>
-        <QueueTable
-          issues={filtered}
-          selectedKey={selectedKey}
-          onSelect={setSelectedKey}
-        />
+        {/* Fixed-height track so the bar appearing doesn't shift the table. */}
+        <div className="progress-track">
+          {refreshing && <div className="progress-fill" />}
+        </div>
+        <div className={refreshing ? 'table-wrap refreshing' : 'table-wrap'}>
+          <QueueTable
+            issues={filtered}
+            selectedKey={selectedKey}
+            onSelect={setSelectedKey}
+          />
+        </div>
       </div>
       <div className="detail-pane">
         {selectedKey ? (

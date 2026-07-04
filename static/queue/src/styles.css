@@ -20,6 +20,79 @@ body {
   color: #de350b;
 }
 
+.message.loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- Loading indicators --- */
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #dfe1e6;
+  border-top-color: #0052cc;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: -2px;
+}
+
+.spinner-small {
+  width: 10px;
+  height: 10px;
+  margin-right: 4px;
+}
+
+/* For use on solid-blue buttons where the grey ring would vanish. */
+.spinner-light {
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-color: rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Thin indeterminate bar shown above the table while it refreshes.
+   The track keeps its height when idle so the table doesn't jump. */
+.progress-track {
+  height: 2px;
+  margin-bottom: 6px;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 40%;
+  border-radius: 1px;
+  background: #0052cc;
+  animation: indeterminate 1.2s ease-in-out infinite;
+}
+
+@keyframes indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
+}
+
+.table-wrap {
+  transition: opacity 0.15s ease;
+}
+
+.table-wrap.refreshing {
+  opacity: 0.6;
+}
+
 /* --- Layout: table left, detail right --- */
 .workspace {
   display: flex;
@@ -69,8 +142,13 @@ body {
   cursor: pointer;
 }
 
-.refresh-button:hover {
+.refresh-button:hover:not(:disabled) {
   background: #ebecf0;
+}
+
+.refresh-button:disabled {
+  color: #6b778c;
+  cursor: default;
 }
 
 /* --- Filter bar --- */

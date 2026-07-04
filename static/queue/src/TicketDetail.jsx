@@ -61,9 +61,12 @@ const TicketDetail = ({ issueKey, onTicketChanged }) => {
   // switched rows: only the latest load() call may write state.
   const loadGeneration = React.useRef(0);
 
-  const load = async () => {
+  // background: true re-fetches without tearing the pane down to a loading
+  // screen — used after submit/assign so the thread stays visible while the
+  // updated ticket loads.
+  const load = async ({ background = false } = {}) => {
     const generation = ++loadGeneration.current;
-    setState({ status: 'loading' });
+    if (!background) setState({ status: 'loading' });
     try {
       const data = await invoke('getTicket', { issueKey });
       if (generation === loadGeneration.current) {
@@ -105,7 +108,7 @@ const TicketDetail = ({ issueKey, onTicketChanged }) => {
     setSubmitError(null);
     try {
       await invoke('assignIssue', { issueKey, accountId });
-      await load();
+      await load({ background: true });
       onTicketChanged();
     } catch (err) {
       console.error('Failed to assign', err);
@@ -137,7 +140,7 @@ const TicketDetail = ({ issueKey, onTicketChanged }) => {
       if (!result.ok) {
         setSubmitError(result.transitionError || 'Status change failed');
       }
-      await load();
+      await load({ background: true });
       onTicketChanged();
     } catch (err) {
       console.error('Failed to submit reply', err);
@@ -148,7 +151,11 @@ const TicketDetail = ({ issueKey, onTicketChanged }) => {
   };
 
   if (state.status === 'loading') {
-    return <div className="message">Loading {issueKey}…</div>;
+    return (
+      <div className="message loading">
+        <span className="spinner" /> Loading {issueKey}…
+      </div>
+    );
   }
   if (state.status === 'error') {
     return (
@@ -183,7 +190,13 @@ const TicketDetail = ({ issueKey, onTicketChanged }) => {
             disabled={assigning}
             onClick={() => assign('me')}
           >
-            {assigning ? 'Assigning…' : 'Assign to me'}
+            {assigning ? (
+              <>
+                <span className="spinner spinner-small" /> Assigning…
+              </>
+            ) : (
+              'Assign to me'
+            )}
           </button>
           <select
             className="status-select"
@@ -275,7 +288,13 @@ const TicketDetail = ({ issueKey, onTicketChanged }) => {
             className="submit-button"
             disabled={submitting || (!reply.trim() && !transitionId)}
           >
-            {submitting ? 'Submitting…' : 'Submit'}
+            {submitting ? (
+              <>
+                <span className="spinner spinner-light" /> Submitting…
+              </>
+            ) : (
+              'Submit'
+            )}
           </button>
         </div>
         {submitError && (
