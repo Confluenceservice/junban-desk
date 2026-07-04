@@ -48,8 +48,9 @@ Thumbs.db
 *.mov
 *.wmv
 
-AGENTS.md
+# Personal agent config + local research notes stay private; AGENTS.md is the public guide
 CLAUDE.md
+jsm-forge-research.md
 
 # Real manifest carries our private app id — share manifest.yml.example instead
 manifest.yml

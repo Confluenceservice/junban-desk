@@ -50,6 +50,12 @@ The app appears as **re-desk** in the sidebar of your JSM project.
 - Frontend changes: re-run `npm run build:queue`, then refresh (no hot reload for Custom UI).
 - Manifest changes: redeploy; scope changes also need `forge install --upgrade`.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, testing, and PR guidelines. If you work
+with an AI coding assistant, [AGENTS.md](AGENTS.md) documents the architecture and
+constraints it should follow.
+
 ## License
 
 [Apache 2.0](LICENSE)
