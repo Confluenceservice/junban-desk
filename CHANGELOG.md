@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-07-04
+
+### Added
+
+- Loading spinners for the initial queue and ticket loads, an indeterminate
+  progress bar while the table refreshes, and inline spinners on the Submit
+  and Assign-to-me buttons
+- URLs in descriptions and comments are collapsed into short clickable links
+  (full URL on hover), taming email-origin tickets full of tracking links
+- The selected ticket is remembered across page reloads and restored if it
+  still needs action
+- The detail pane refreshes itself when the queue poll sees the ticket
+  change (another agent replied or transitioned it), preventing stale views
+  and double handling
+
+### Changed
+
+- The detail pane reloads in the background after submitting or assigning,
+  keeping the thread visible instead of flashing to a loading screen
+- Smart links and hard breaks in ADF bodies now survive text extraction
+
+### Fixed
+
+- `npm run lint` now actually lints the frontend (`.jsx` needs `--ext` on
+  ESLint 8) and no longer breaks on stray non-lintable files
+
 ## [0.1.0] - 2026-07-04
 
 ### Added
@@ -21,4 +47,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Forge manifest template (`manifest.yml.example`) so forks register their
   own app id
 
+[0.2.0]: https://github.com/thomasbergernz/re-desk/releases/tag/v0.2.0
 [0.1.0]: https://github.com/thomasbergernz/re-desk/releases/tag/v0.1.0
