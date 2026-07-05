@@ -1,5 +1,7 @@
 # Junban Desk — user guide
 
+Junban (順番 — means “order,” “sequence,” or “the proper arrangement of things.” It is used to refer to the prescribed or logical order in which items, actions, or events should occur.)
+
 Junban Desk replaces the default Jira Service Management queue views with a single,
 focused agent workspace: a "needs action" ticket table on the left and an inline
 ticket detail pane on the right. Agents triage, reply, and resolve without ever
@@ -15,11 +17,11 @@ Open any Jira Service Management project and choose **Junban Desk** in the proje
 sidebar (under Queues). The workspace has two panes; drag the divider between
 them to resize, or double-click it to reset.
 
-<!-- Screenshot: full workspace, queue table left + detail pane right -->
+![Junban Desk workspace](workspace.png)
 
 ### The "needs action" queue
 
-The table shows every open ticket in the project that is **not waiting on the
+The table shows every open ticket (work item) in the project that is **not waiting on the
 customer**, oldest update first — so the ticket that has waited longest is at
 the top. Tickets that are resolved or in a "Waiting for customer" status are
 hidden automatically.
