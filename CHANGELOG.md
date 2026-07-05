@@ -8,6 +8,28 @@ release is deployed to production (`forge deploy -e production`), so the
 changelog matches the app version site admins see. Earlier releases used
 SemVer.
 
+## [Released]
+
+### Changed
+
+- Renamed the app from re-desk to Junban Desk across the manifest template,
+  package metadata, UI strings, docs, and localStorage keys
+- Moved `@forge/bridge` off the `6.0.1-next` prerelease to stable `^6.0.0`
+  and synced the frontend package version with the root
+- Merged the queue header and filter rows into one wrapping toolbar with
+  live per-filter counts (All / Unassigned / Assigned to me); the Summary
+  column now absorbs spare width and truncates with an ellipsis
+- The detail pane closes on an explicit filter change if the open ticket
+  isn't in the new view, and shows the issue key and summary on one row
+
+### Added
+
+- End-user and admin docs under `docs/` (served at docs.junbandesk.com via
+  GitHub Pages): user guide, install guide with scope justification, support
+  policy, and privacy policy
+- `SECURITY.md` vulnerability-disclosure policy, linked from CONTRIBUTING
+- README links to the docs, support, and privacy pages
+
 ## [2.1.0] - 2026-07-04
 
 ### Added
