@@ -8,6 +8,7 @@ leaving the queue, a Zendesk-style agent workspace for JSM.
 - [Installation and setup](install.md)
 - [Support](support.md)
 - [Privacy policy](privacy.md)
+- [Security policy](security.md)
 
 ## The workspace
 
