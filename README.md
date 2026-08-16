@@ -23,7 +23,7 @@ checks always apply.
 - **Privacy policy:** <https://docs.junbandesk.com/privacy>
 - **Security policy:** [SECURITY.md](SECURITY.md)
 
-The easiest way to use Junban Desk is the Atlassian Marketplace listing (paid, per user).
+The easiest way to use Junban Desk is the [Atlassian Marketplace listing](https://marketplace.atlassian.com/apps/555642809/junban-desk-free) (paid, per user).
 The instructions below are for running your own copy from source.
 
 ## Project layout
