@@ -4,7 +4,8 @@
 
 ## Install from the Atlassian Marketplace
 
-1. In Jira, go to **Apps → Explore more apps** (you need Jira admin
+1. Open the [Junban Desk listing](https://marketplace.atlassian.com/apps/555642809/junban-desk-free),
+   or in Jira go to **Apps → Explore more apps** (you need Jira admin
    permission).
 2. Search for **Junban Desk** and choose **Install** (or start a free trial).
 3. Accept the requested permissions (listed below).
