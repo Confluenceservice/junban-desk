@@ -17,10 +17,15 @@ checks always apply.
 
 ## Documentation and support
 
-- **User guide:** <https://docs.junbandesk.com/>
-- **Installation:** <https://docs.junbandesk.com/install>
-- **Support:** <https://docs.junbandesk.com/support>
-- **Privacy policy:** <https://docs.junbandesk.com/privacy>
+The `docs/` folder here is the **Open Source edition** guide — the one for running your own copy
+from this repo. It publishes via GitHub Pages to
+**<https://confluenceservice.github.io/junban-desk/>**, not `docs.junbandesk.com` (that domain is
+the Marketplace/Cloud edition docs, built from a separate, private repo).
+
+- **User guide:** <https://confluenceservice.github.io/junban-desk/>
+- **Installation:** <https://confluenceservice.github.io/junban-desk/install>
+- **Support:** <https://confluenceservice.github.io/junban-desk/support>
+- **Privacy policy:** <https://confluenceservice.github.io/junban-desk/privacy>
 - **Security policy:** [SECURITY.md](SECURITY.md)
 
 The easiest way to use Junban Desk is the Atlassian Marketplace listing (paid, per user).
