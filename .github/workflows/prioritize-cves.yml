@@ -32,6 +32,28 @@ jobs:
         with:
           fetch-depth: 1
 
+      # Both lockfiles must resolve entirely from the public registry. A stray
+      # packages.atlassian.com URL once made `npm ci` impossible on a clean
+      # runner while still working locally from a warm cache, so it went
+      # unnoticed until this repo got its first CI. It comes back any time
+      # someone runs `npm install` on a machine pointed at another registry.
+      - name: Check lockfiles resolve from public npm
+        run: |
+          set -euo pipefail
+          for f in package-lock.json static/queue/package-lock.json; do
+            if ! jq -e '[.packages[].resolved // empty]
+                        | all(startswith("https://registry.npmjs.org/"))' \
+                   "$f" > /dev/null; then
+              echo "::error file=$f::Lockfile has a resolved URL outside registry.npmjs.org:"
+              jq -r '.packages | to_entries[]
+                     | select(.value.resolved
+                              and (.value.resolved | startswith("https://registry.npmjs.org/") | not))
+                     | "  \(.key) -> \(.value.resolved)"' "$f"
+              exit 1
+            fi
+          done
+          echo "Both lockfiles resolve from registry.npmjs.org."
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
