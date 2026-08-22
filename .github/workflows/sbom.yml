@@ -1,0 +1,97 @@
+name: SBOM
+
+# Publishes a Software Bill of Materials for the app's production dependency
+# tree. Junban Desk is distributed through the Atlassian Marketplace, and
+# partner security questionnaires routinely ask for one.
+#
+# This is separate from prioritize-cves.yml, which generates its own SBOM
+# inline and throws it away. That one is a gate; this one is an artifact.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write # required to upload release assets
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      # Full install: `npm sbom` reads the installed tree and wants it complete
+      # and consistent before it will filter with --omit=dev.
+      - name: Install dependencies (backend and queue UI)
+        run: |
+          npm ci
+          npm ci --prefix static/queue
+
+      # Two independent npm projects with separate lockfiles, both shipped: the
+      # Forge backend at the root, and the JSM queue UI under static/queue.
+      # A root-only SBOM would omit react, @forge/bridge, and everything else
+      # Vite bundles into static/queue/dist.
+      #
+      # --omit=dev matches what Forge actually bundles. eslint and vitest are
+      # never deployed, so they do not belong in an SBOM describing the app.
+      - name: Generate SBOMs (production dependencies only)
+        run: |
+          mkdir -p sbom
+          npm sbom --sbom-format cyclonedx --omit=dev > sbom/backend.cyclonedx.json
+          npm sbom --sbom-format spdx      --omit=dev > sbom/backend.spdx.json
+          npm sbom --sbom-format cyclonedx --omit=dev --prefix static/queue \
+            > sbom/queue.cyclonedx.json
+          npm sbom --sbom-format spdx      --omit=dev --prefix static/queue \
+            > sbom/queue.spdx.json
+
+      # The root component is stamped from package.json "version". If that field
+      # drifts from the release tag the SBOM ships mislabeled, which defeats the
+      # point of publishing one — so fail loudly instead. Both package.json
+      # files are checked; they are versioned in lockstep.
+      - name: Check package versions match the release tag
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          for f in package.json static/queue/package.json; do
+            pkg=$(jq -r '.version' "$f")
+            # Tolerate a leading "v"; this repo's tags carry one (v2.1.0).
+            if [ "$pkg" != "${TAG#v}" ]; then
+              echo "::error::$f version ($pkg) does not match the release tag ($TAG)."
+              echo "Bump the version field before publishing the release."
+              exit 1
+            fi
+          done
+
+      - name: Report SBOM contents
+        run: |
+          for f in sbom/backend.cyclonedx.json sbom/queue.cyclonedx.json; do
+            version=$(jq -r '.metadata.component.version' "$f")
+            components=$(jq '[.components[]] | length' "$f")
+            echo "$f: version $version, $components components"
+          done
+
+      - name: Attach SBOMs to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Passed via env rather than inlined into the script: a tag name is
+          # user-supplied text and must never be interpolated into a shell
+          # command directly.
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" sbom/*.json --clobber
+
+      - name: Upload SBOMs as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom/
