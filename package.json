@@ -16,7 +16,7 @@
     "vitest": "^4.1.9"
   },
   "dependencies": {
-    "@forge/api": "^6.0.0",
+    "@forge/api": "^8.0.4",
     "@forge/resolver": "2.0.0"
   }
 }
