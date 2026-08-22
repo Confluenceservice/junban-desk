@@ -4,7 +4,7 @@
 
 Please do **not** open public issues for security vulnerabilities. Report them
 privately via
-[GitHub Security Advisories](https://github.com/thomasbergernz/junban-desk/security/advisories/new).
+[GitHub Security Advisories](https://github.com/Confluenceservice/junban-desk/security/advisories/new).
 
 Include what you found, how to reproduce it, and the impact you believe it has.
 We will acknowledge reports within 2 business days and keep you informed while
