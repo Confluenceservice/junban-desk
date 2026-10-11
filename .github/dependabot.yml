@@ -1,0 +1,32 @@
+# Dependabot: security alerts are always on for public repos; this adds
+# scheduled version-update PRs. Same shape as jimumember's config.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    # Two lockfiles: the Forge backend at the root and the Custom UI
+    # (static/queue) that it serves. One entry covers both.
+    directories:
+      - "/"
+      - "/static/queue"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Pacific/Auckland"
+    open-pull-requests-limit: 5
+    groups:
+      # @forge/api, @forge/resolver and @forge/bridge talk to each other
+      # across the backend/UI boundary, so they move together in one PR,
+      # majors included. Check the Forge changelog before merging a major.
+      forge:
+        patterns: ["@forge/*"]
+      # One PR for all other minor+patch bumps — keeps the queue reviewable.
+      minor-and-patch:
+        applies-to: version-updates
+        update-types: ["minor", "patch"]
+    # Everything else's majors arrive as individual PRs.
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
