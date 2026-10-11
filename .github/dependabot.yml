@@ -19,7 +19,7 @@ updates:
       # across the backend/UI boundary, so they move together in one PR,
       # majors included. Check the Forge changelog before merging a major.
       forge:
-        patterns: ["@forge/*"]
+        patterns: ["@forge*"]   # not "@forge/*": Dependabot matched nothing with that form
       # One PR for all other minor+patch bumps — keeps the queue reviewable.
       minor-and-patch:
         applies-to: version-updates
